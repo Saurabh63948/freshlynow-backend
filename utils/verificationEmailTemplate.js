@@ -1,5 +1,6 @@
 const verifyEmailTemplate = ({ name, token }) => {
-  const url = `https://tantalizingly-garbleable-lia.ngrok-free.dev/api/users/verify-email?token=${token}`;
+  // const url = `https://tantalizingly-garbleable-lia.ngrok-free.dev/api/users/verify-email?token=${token}`;
+const url = `https://freshlynow-backend.onrender.com/api/users/verify-email?token=${token}`;
 
   return `
     <p>Dear ${name},</p>
