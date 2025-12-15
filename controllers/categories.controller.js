@@ -18,7 +18,7 @@ export const createCategory = async (req, res) => {
     //  upload image to cloudinary (optional)
     if (imageFile) {
       const upload = await uploadImageClodinary(imageFile);
-      imageUrl = upload.secure_url;
+      imageUrl = upload.url;
     }
 
     const category = await CategoryModel.create({

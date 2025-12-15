@@ -264,13 +264,13 @@ export async function uploadImageAvtar(req, res) {
 
     const upload = await uploadImageClodinary(image);
     const updateUser = await UserModel.findByIdAndUpdate(userId, {
-      avatar: upload.secure_url,
+      avatar: upload.url,
     });
     return res.json({
       message: "upload profile",
       data: {
         _id: userId,
-        avatar: upload.secure_url,
+        avatar: upload.url,
       },
     });
   } catch (error) {
