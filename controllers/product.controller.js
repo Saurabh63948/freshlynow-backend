@@ -19,32 +19,62 @@ export const getProducts = async (req, res) => {
   }
 };
 
-export const uploadProductImage =async(req,res)=>{
+// export const uploadProductImage =async(req,res)=>{
+//   try {
+//     const image =req.file;
+//     if(!image){
+//       return res.status(400).json({
+//         success: false,
+//         message: "Image file is required",
+//       });
+//     }
+
+//     const upload =await uploadImageClodinary(image);
+//     return res.status(200).json({
+//       success :true,
+//       data:{
+//         url:upload.url,
+//         public_id:upload.public_id,
+//       },
+//     })
+//   } 
+//     catch (error) {
+//     return res.status(500).json({
+//       success: false,
+//       message: error.message,
+//     });
+//   }
+// }
+
+export const uploadProductImage = async (req, res) => {
   try {
-    const image =req.file;
-    if(!image){
+    const image = req.file;
+
+    if (!image) {
       return res.status(400).json({
         success: false,
         message: "Image file is required",
       });
     }
 
-    const upload =await uploadImageClodinary(image);
+    const upload = await uploadImageClodinary(image);
+
     return res.status(200).json({
-      success :true,
-      data:{
-        url:upload.url,
-        public_id:upload.public_id,
+      success: true,
+      data: {
+      
+        url: upload.secure_url,   
+        public_id: upload.public_id,
       },
-    })
-  } 
-    catch (error) {
+    });
+  } catch (error) {
     return res.status(500).json({
       success: false,
       message: error.message,
     });
   }
-}
+};
+
 
 export const createProduct = async (req, res) => {
   try {
