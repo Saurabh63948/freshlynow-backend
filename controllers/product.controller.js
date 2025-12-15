@@ -76,6 +76,56 @@ export const uploadProductImage = async (req, res) => {
 };
 
 
+// export const createProduct = async (req, res) => {
+//   try {
+//     const {
+//       name,
+//       image,
+//       category,
+//       subCategory,
+//       unit,
+//       stock,
+//       price,
+//       discount,
+//       description,
+//       more_details,
+//       publish,
+//     } = req.body;
+
+//     if (!name || !price) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Product name and price are required",
+//       });
+//     }
+
+//     const product = await productModel.create({
+//       name,
+//       image,
+//       category,
+//       subCategory,
+//       unit,
+//       stock,
+//       price,
+//       discount,
+//       description,
+//       more_details,
+//       publish,
+//     });
+
+//     return res.status(201).json({
+//       success: true,
+//       data: product,
+//     });
+//   } catch (error) {
+//     return res.status(500).json({
+//       success: false,
+//       message: error.message,
+//     });
+//   }
+// };
+
+
 export const createProduct = async (req, res) => {
   try {
     const {
@@ -101,7 +151,7 @@ export const createProduct = async (req, res) => {
 
     const product = await productModel.create({
       name,
-      image,
+      image: Array.isArray(image) ? image : [image], // ✅ FIX
       category,
       subCategory,
       unit,
