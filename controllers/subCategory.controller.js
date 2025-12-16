@@ -19,7 +19,7 @@ export const createSubCategory = async (req, res) => {
     // optional image upload
     if (imageFile) {
       const upload = await uploadImageClodinary(imageFile);
-      imageUrl = upload.url;
+      imageUrl = upload.secure_url;
     }
 
     const subCategory = await SubCategoryModel.create({

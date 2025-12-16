@@ -33,7 +33,7 @@ export const uploadProductImage =async(req,res)=>{
     return res.status(200).json({
       success :true,
       data:{
-        url:upload.url,
+        url:upload.secure_url,
         public_id:upload.public_id,
       },
     })

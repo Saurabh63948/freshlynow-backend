@@ -257,30 +257,65 @@ export async function logoutController(req, res) {
 
 //upload user avtar
 
+// export async function uploadImageAvtar(req, res) {
+//   try {
+//     const userId = req.userId; // coming from auth middleware
+//     const image = req.file; // multer middleware
+
+//     const upload = await uploadImageClodinary(image);
+//     const updateUser = await UserModel.findByIdAndUpdate(userId, {
+//       avatar: upload.secure_url || upload.url,
+//     });
+//     return res.json({
+//       message: "upload profile",
+//       data: {
+//         _id: userId,
+//         avatar: upload.secure_url,
+//       },
+//     });
+//   } catch (error) {
+//     return res.status(500).json({
+//       message: error.message || error,
+//       error: true,
+//       // success: false
+//     });
+//   }
+// }
 export async function uploadImageAvtar(req, res) {
   try {
-    const userId = req.userId; // coming from auth middleware
-    const image = req.file; // multer middleware
+    const userId = req.userId;
+    const image = req.file;  
+
+    if (!image) {
+      return res.status(400).json({
+        error: true,
+        message: "Image is required",
+      });
+    }
 
     const upload = await uploadImageClodinary(image);
-    const updateUser = await UserModel.findByIdAndUpdate(userId, {
-      avatar: upload.url,
-    });
+
+    await UserModel.findByIdAndUpdate(
+      userId,
+      { avatar: upload.secure_url },
+      { new: true }
+    );
+
     return res.json({
-      message: "upload profile",
+      message: "Profile image uploaded successfully",
       data: {
         _id: userId,
-        avatar: upload.url,
+        avatar: upload.secure_url,
       },
     });
   } catch (error) {
     return res.status(500).json({
-      message: error.message || error,
       error: true,
-      // success: false
+      message: error.message || "Server error",
     });
   }
 }
+
 
 //update user details
 export  async function updateUserDetails(req, res) {
