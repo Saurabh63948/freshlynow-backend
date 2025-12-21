@@ -169,25 +169,23 @@ export async function registerUserController(req, res) {
 
     // ✅ Email sending should NOT break register
     try {
-      const verifyUrl = `https://tantalizingly-garbleable-lia.ngrok-free.dev/api/users/verify-email?token=${savedUser._id}`;
-
       await sendEmail({
         sendTo: email,
-        subject: "Verify Your Email - Binkeyit",
+        subject: "Verify Your Email - FreshlyNow",
         html: verifyEmailTemplate({
           name,
-          url: verifyUrl,
+          token: savedUser._id,   // ✅ CORRECT
         }),
       });
     } catch (emailError) {
       console.error("Email sending failed:", emailError.message);
     }
 
-    // ✅ Always send success if user is saved
-    return res.status(201).json({
-      message: "User registered successfully. Please verify your email.",
-      error: false,
+    // ✅ Send success always
+    return res.status(200).json({
       success: true,
+      error: false,
+      message: "User registered successfully. Please verify your email.",
     });
 
   } catch (error) {
@@ -201,37 +199,81 @@ export async function registerUserController(req, res) {
 }
 
 
+
+// export async function verifyEmailController(req, res) {
+//   try {
+//     const { token } = req.query;
+
+//     if (!token) {
+//       return res.send("Invalid verification link");
+//     }
+
+//     const user = await UserModel.findById(token);
+
+//     if (!user) {
+//       return res.send("Invalid or expired verification link");
+//     }
+
+//     if (user.verify_email) {
+//       return res.send(`
+//         <h2>Email already verified </h2>
+//         <p>You can now login.</p>
+//       `);
+//     }
+
+//     user.verify_email = true;
+//     await user.save();
+
+//     return res.send(`
+//       <h2>Email verified successfully 🎉</h2>
+//       <p>You can now login in the app.</p>
+//     `);
+
+//   } catch (error) {
+//     return res.send("Verification failed");
+//   }
+// }
 export async function verifyEmailController(req, res) {
   try {
     const { token } = req.query;
 
     if (!token) {
-      return res.send("Invalid verification link");
+      return res.status(400).send(`
+        <h2>Invalid verification link</h2>
+        <p>The verification token is missing.</p>
+      `);
     }
 
     const user = await UserModel.findById(token);
 
     if (!user) {
-      return res.send("Invalid or expired verification link");
+      return res.status(400).send(`
+        <h2>Invalid or expired link</h2>
+        <p>Please request a new verification email.</p>
+      `);
     }
 
     if (user.verify_email) {
-      return res.send(`
-        <h2>Email already verified </h2>
-        <p>You can now login.</p>
+      return res.status(200).send(`
+        <h2>Email already verified ✅</h2>
+        <p>You can now login in the app.</p>
       `);
     }
 
     user.verify_email = true;
     await user.save();
 
-    return res.send(`
+    return res.status(200).send(`
       <h2>Email verified successfully 🎉</h2>
       <p>You can now login in the app.</p>
     `);
 
   } catch (error) {
-    return res.send("Verification failed");
+    console.error("Verify email error:", error.message);
+    return res.status(500).send(`
+      <h2>Verification failed</h2>
+      <p>Please try again later.</p>
+    `);
   }
 }
 
