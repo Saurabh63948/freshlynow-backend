@@ -72,6 +72,68 @@ import jwt from "jsonwebtoken"
 //     });
 //   }
 // }
+// export async function registerUserController(req, res) {
+//   try {
+//     const { name, email, password } = req.body;
+
+//     if (!name || !email || !password) {
+//       return res.status(400).json({
+//         message: "Provide all required fields",
+//         error: true,
+//         success: false,
+//       });
+//     }
+
+//     const existingUser = await UserModel.findOne({ email });
+//     if (existingUser) {
+//       return res.status(409).json({
+//         message: "User is already registered with this email",
+//         error: true,
+//         success: false,
+//       });
+//     }
+
+//     const salt = await bcrypt.genSalt(10);
+//     const hashPassword = await bcrypt.hash(password, salt);
+
+//     const newUser = new UserModel({
+//       name,
+//       email,
+//       password: hashPassword,
+//       verify_email: false,
+//     });
+
+//     const savedUser = await newUser.save();
+
+    
+//     const verifyUrl = `https://tantalizingly-garbleable-lia.ngrok-free.dev/api/users/verify-email?token=${savedUser._id}`;
+
+//     await sendEmail({
+//       sendTo: email,
+//       subject: "Verify Your Email - Binkeyit",
+//       html: verifyEmailTemplate({
+//         name,
+//         url: verifyUrl,
+//       }),
+//     });
+
+//     return res.status(201).json({
+//       message: "User registered successfully. Verification email sent.",
+//       error: false,
+//       success: true,
+//     });
+
+//   } catch (error) {
+//     console.error("Register error:", error.message);
+//     return res.status(500).json({
+//       message: "Server error",
+//       error: true,
+//       success: false,
+//     });
+//   }
+// }
+
+
 export async function registerUserController(req, res) {
   try {
     const { name, email, password } = req.body;
@@ -105,20 +167,25 @@ export async function registerUserController(req, res) {
 
     const savedUser = await newUser.save();
 
-    
-    const verifyUrl = `https://tantalizingly-garbleable-lia.ngrok-free.dev/api/users/verify-email?token=${savedUser._id}`;
+    // ✅ Email sending should NOT break register
+    try {
+      const verifyUrl = `https://tantalizingly-garbleable-lia.ngrok-free.dev/api/users/verify-email?token=${savedUser._id}`;
 
-    await sendEmail({
-      sendTo: email,
-      subject: "Verify Your Email - Binkeyit",
-      html: verifyEmailTemplate({
-        name,
-        url: verifyUrl,
-      }),
-    });
+      await sendEmail({
+        sendTo: email,
+        subject: "Verify Your Email - Binkeyit",
+        html: verifyEmailTemplate({
+          name,
+          url: verifyUrl,
+        }),
+      });
+    } catch (emailError) {
+      console.error("Email sending failed:", emailError.message);
+    }
 
+    // ✅ Always send success if user is saved
     return res.status(201).json({
-      message: "User registered successfully. Verification email sent.",
+      message: "User registered successfully. Please verify your email.",
       error: false,
       success: true,
     });
