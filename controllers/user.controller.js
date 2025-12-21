@@ -140,8 +140,7 @@ export async function registerUserController(req, res) {
 
     if (!name || !email || !password) {
       return res.status(400).json({
-        message: "Provide all required fields",
-        error: true,
+        message: "All fields required",
         success: false,
       });
     }
@@ -149,54 +148,34 @@ export async function registerUserController(req, res) {
     const existingUser = await UserModel.findOne({ email });
     if (existingUser) {
       return res.status(409).json({
-        message: "User is already registered with this email",
-        error: true,
+        message: "User already exists",
         success: false,
       });
     }
 
-    const salt = await bcrypt.genSalt(10);
-    const hashPassword = await bcrypt.hash(password, salt);
+    const hashPassword = await bcrypt.hash(password, 10);
 
-    const newUser = new UserModel({
+    await UserModel.create({
       name,
       email,
       password: hashPassword,
-      verify_email: false,
+      verify_email: true, // 🔥 TEMPORARILY TRUE
     });
 
-    const savedUser = await newUser.save();
-
-    // ✅ Email sending should NOT break register
-    try {
-      await sendEmail({
-        sendTo: email,
-        subject: "Verify Your Email - FreshlyNow",
-        html: verifyEmailTemplate({
-          name,
-          token: savedUser._id,   // ✅ CORRECT
-        }),
-      });
-    } catch (emailError) {
-      console.error("Email sending failed:", emailError.message);
-    }
-
-    // ✅ Send success always
-    return res.status(200).json({
+    return res.status(201).json({
+      message: "User registered successfully",
       success: true,
-      error: false,
-      message: "User registered successfully. Please verify your email.",
     });
 
-  } catch (error) {
-    console.error("Register error:", error.message);
+  } catch (err) {
+    console.error(err);
     return res.status(500).json({
       message: "Server error",
-      error: true,
       success: false,
     });
   }
 }
+
 
 
 
